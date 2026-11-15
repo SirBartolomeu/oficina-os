@@ -1,3 +1,0 @@
-﻿# Exemplo de variaveis locais. Copie para terraform.tfvars se quiser sobrescrever defaults.
-cluster_name  = "oficina-local"
-api_host_port = 8080
