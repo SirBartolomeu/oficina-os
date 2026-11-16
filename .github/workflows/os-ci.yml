@@ -24,9 +24,9 @@ jobs:
         with:
           global-json-file: global.json
       - name: Domain tests
-        run: dotnet test tests/OficinaMvp.Domain.Tests --configuration Release --logger trx --results-directory test-results/os-domain
+        run: dotnet test tests/OficinaMvp.Domain.Tests --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory test-results/os-domain
       - name: OS integration tests
-        run: dotnet test tests/OficinaMvp.Integration.Tests --configuration Release --logger trx --results-directory test-results/os-integration
+        run: dotnet test tests/OficinaMvp.Integration.Tests --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory test-results/os-integration
       - name: Start PostgreSQL for concurrency test
         run: |
           docker run --rm -d --name oficina-os-postgres -e POSTGRES_PASSWORD=local-ci-password -p 127.0.0.1:5432:5432 postgres:16-alpine
@@ -39,7 +39,7 @@ jobs:
       - name: OS PostgreSQL concurrency test
         env:
           OS_POSTGRES_CONNECTION_STRING: Host=127.0.0.1;Port=5432;Database=postgres;Username=postgres;Password=local-ci-password
-        run: dotnet test tests/OficinaMvp.Postgres.Tests --configuration Release --logger trx --results-directory test-results/os-postgres
+        run: dotnet test tests/OficinaMvp.Postgres.Tests --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory test-results/os-postgres
       - name: Build OS container
         run: docker build -f src/OficinaMvp.Api/Dockerfile -t oficina-os:${{ github.sha }} .
       - name: ECR publication pending configuration
@@ -92,5 +92,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: os-test-results
-          path: test-results/**/*.trx
+          path: |
+            test-results/**/*.trx
+            test-results/**/coverage.cobertura.xml
           if-no-files-found: ignore
