@@ -81,6 +81,68 @@ public sealed class CatalogCrudTests
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/vehicles/{vehicle.Id}")).StatusCode);
     }
 
+    [Fact]
+    public async Task RepairServiceCanBeCreatedUpdatedListedAndRemoved()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+        await AuthenticateAsync(client);
+
+        var missingId = Guid.NewGuid();
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/services/{missingId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync($"/api/services/{missingId}",
+            new UpsertRepairServiceRequest("Revisão", "Inspeção", 120m, 45))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/services/{missingId}")).StatusCode);
+
+        var created = await client.PostAsJsonAsync("/api/services",
+            new UpsertRepairServiceRequest("Revisão", "Inspeção", 120m, 45));
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var service = (await created.Content.ReadFromJsonAsync<RepairServiceResponse>())!;
+        Assert.Equal(120m, service.LaborPrice);
+        Assert.Contains((await client.GetFromJsonAsync<List<RepairServiceResponse>>("/api/services"))!,
+            item => item.Id == service.Id);
+
+        var updated = await client.PutAsJsonAsync($"/api/services/{service.Id}",
+            new UpsertRepairServiceRequest("Revisão completa", "Inspeção e ajuste", 180m, 60));
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+        var saved = await client.GetFromJsonAsync<RepairServiceResponse>($"/api/services/{service.Id}");
+        Assert.Equal("Revisão completa", saved!.Name);
+        Assert.Equal(180m, saved.LaborPrice);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/services/{service.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/services/{service.Id}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task PartCanBeCreatedUpdatedListedAndRemoved()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+        await AuthenticateAsync(client);
+
+        var missingId = Guid.NewGuid();
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/parts/{missingId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync($"/api/parts/{missingId}",
+            new UpsertPartSupplyRequest("Filtro", 30m, 4))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/parts/{missingId}")).StatusCode);
+
+        var created = await client.PostAsJsonAsync("/api/parts",
+            new UpsertPartSupplyRequest("Filtro", 30m, 4));
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var part = (await created.Content.ReadFromJsonAsync<PartSupplyResponse>())!;
+        Assert.Equal(4, part.StockQuantity);
+        Assert.Contains((await client.GetFromJsonAsync<List<PartSupplyResponse>>("/api/parts"))!,
+            item => item.Id == part.Id);
+
+        var updated = await client.PutAsJsonAsync($"/api/parts/{part.Id}",
+            new UpsertPartSupplyRequest("Filtro premium", 45m, 8));
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+        var saved = await client.GetFromJsonAsync<PartSupplyResponse>($"/api/parts/{part.Id}");
+        Assert.Equal("Filtro premium", saved!.Name);
+        Assert.Equal(8, saved.StockQuantity);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/parts/{part.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/parts/{part.Id}")).StatusCode);
+    }
+
     private static async Task AuthenticateAsync(HttpClient client)
     {
         var response = await client.PostAsJsonAsync("/api/auth/token", new TokenRequest("admin", "Admin@123"));
