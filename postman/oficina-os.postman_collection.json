@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Oficina OS Service",
+    "description": "Coleção simples para execução local em Development. Preencha variáveis e IDs no Postman; tokens permanecem locais e não devem ser salvos em commits. Valores default apontam apenas para localhost.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health readiness",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health/ready",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": []
+    },
+    {
+      "name": "Criar OS",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/work-orders",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerDocument\": \"{{customerDocument}}\",\n  \"vehicle\": {\n    \"licensePlate\": \"ABC1D23\",\n    \"brand\": \"FIAT\",\n    \"model\": \"Uno\",\n    \"year\": 2020\n  },\n  \"services\": [\n    {\n      \"serviceId\": \"{{serviceId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"parts\": [],\n  \"notes\": \"Exemplo Postman\",\n  \"branchId\": \"{{branchId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Consultar estado da OS",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/work-orders/{{workOrderId}}/status",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Aprovar orçamento",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/work-orders/{{workOrderId}}/approve-budget",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Acompanhar OS como cliente",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/client/work-orders/{{workOrderId}}",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{clientToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clientToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "workOrderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerDocument",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "partId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
