@@ -35,6 +35,14 @@ O cenário BDD de concorrência da Outbox requer `OS_POSTGRES_CONNECTION_STRING`
 
 ## Deploy
 
-O overlay `k8s/services/os` inclui Deployment, Service, ServiceAccount, HPA, ConfigMap, NodePort privado de consulta da Lambda e probes. Valores `REPLACE_WITH_*` em `config.env` são preenchidos pelo bootstrap da infraestrutura; os Secrets de aplicação, AWS temporários e pull ECR são preparados fora do Git. O repositório `oficina-k8s-infra` provisiona o cluster e o `oficina-data-infra` provisiona o banco/filas. Consulte a [arquitetura completa](docs/architecture-phase4.md). Nenhum deploy AWS foi comprovado até a execução autorizada.
+O overlay `k8s/services/os` inclui Deployment, Service, ServiceAccount, HPA, ConfigMap, NodePort privado de consulta da Lambda e probes. Valores `REPLACE_WITH_*` em `config.env` são preenchidos pelo bootstrap da infraestrutura; os Secrets de aplicação, AWS temporários e pull ECR são preparados fora do Git. O repositório `oficina-k8s-infra` provisiona o cluster e o `oficina-data-infra` provisiona o banco/filas. Consulte a [arquitetura completa](docs/architecture-phase4.md). Deploy registrado com sucesso em [os-ci #6](https://github.com/SirBartolomeu/oficina-os/actions/runs/44175724823). A cobertura de linhas registrada foi 81,73%; consulte a execução para os resultados do CI. O fluxo de pagamento Sandbox e a Saga completa na AWS continuam sem confirmação.
+
+
+
+## Swagger, Postman e cobertura
+
+- Swagger local (Development/Testing): `http://localhost:8080/swagger`.
+- Collection Postman: [postman/oficina-os.postman_collection.json](postman/oficina-os.postman_collection.json). Configure `baseUrl`, `adminToken`, `clientToken` e os IDs necessários; use tokens de teste.
+- Cobertura de linhas registrada: **81,73%**. Evidência e artefato: [os-ci #6](https://github.com/SirBartolomeu/oficina-os/actions/runs/44175724823).
 
 Extraído do projeto oficina-mvp, preservando o histórico Git. Sem remote configurado.
